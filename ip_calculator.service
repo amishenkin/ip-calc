@@ -1,0 +1,12 @@
+[Unit]
+Description=Gunicorn instance to serve IP Calculator
+After=network.target
+
+[Service]
+User=ipcalc
+Group=ipcalc
+WorkingDirectory=/home/ipcalc/ip_calculator
+ExecStart=/home/ipcalc/ip_calculator/venv/bin/gunicorn --workers 3 --bind unix:/home/ipcalc/ip_calculator/ip_calculator.sock -m 007 app:app
+
+[Install]
+WantedBy=multi-user.target
