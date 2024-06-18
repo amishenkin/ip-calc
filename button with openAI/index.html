@@ -19,7 +19,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 400px;
+            max-width: 600px;
             margin: auto;
         }
         label {
@@ -52,16 +52,19 @@
             color: #333;
             text-align: center;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        li {
-            background: #fff;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
         .error {
             color: red;
@@ -77,6 +80,10 @@
         <br>
         <label for="prefix_length">Prefix Length:</label>
         <select id="prefix_length" name="prefix_length" required>
+            <option value="0">0 - 0.0.0.0</option>
+            <option value="1">1 - 128.0.0.0</option>
+            <option value="2">2 - 192.0.0.0</option>
+            <option value="3">3 - 224.0.0.0</option>
             <option value="4">4 - 240.0.0.0</option>
             <option value="5">5 - 248.0.0.0</option>
             <option value="6">6 - 252.0.0.0</option>
@@ -112,11 +119,26 @@
     </form>
     {% if network_info %}
         <h2>Network Information</h2>
-        <ul>
-            {% for key, value in network_info.items() %}
-                <li><strong>{{ key }}:</strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Значение</th>
+                    <th>16-ричный код</th>
+                    <th>Бинарное значение</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value_tuple in network_info.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value_tuple[0] }}</td>
+                        <td>{{ value_tuple[1] }}</td>
+                        <td>{{ value_tuple[2] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% elif error %}
         <p class="error">{{ error }}</p>
     {% endif %}

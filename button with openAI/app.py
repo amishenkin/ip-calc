@@ -6,16 +6,36 @@ app = Flask(__name__)
 def calculate_network_info(ip, prefix_length):
     network = ipaddress.IPv4Network(f"{ip}/{prefix_length}", strict=False)
     
+    def to_hex(val):
+        if isinstance(val, ipaddress.IPv4Address):
+            return '.'.join(f'{int(octet):02X}' for octet in str(val).split('.'))
+        return None
+    
+    def to_binary(val):
+        if isinstance(val, ipaddress.IPv4Address):
+            return '.'.join(f'{int(octet):08b}' for octet in str(val).split('.'))
+        return None
+
+    def get_host_min(network):
+        if network.num_addresses > 2:
+            return list(network.hosts())[0]
+        return network.network_address
+
+    def get_host_max(network):
+        if network.num_addresses > 2:
+            return list(network.hosts())[-1]
+        return network.broadcast_address
+
     network_info = {
-        "IP Address": ip,
-        "Prefix Length": prefix_length,
-        "Network Address": network.network_address,
-        "Broadcast Address": network.broadcast_address,
-        "Number of Addresses": network.num_addresses,
-        "Netmask": network.netmask,
-        "Hostmask": network.hostmask,
-        "First Host": list(network.hosts())[0] if network.num_addresses > 2 else network.network_address,
-        "Last Host": list(network.hosts())[-1] if network.num_addresses > 2 else network.broadcast_address
+        "Адрес": (str(network.network_address), to_hex(network.network_address), to_binary(network.network_address)),
+        "Bitmask": (prefix_length, None, None),
+        "Netmask": (str(network.netmask), to_hex(network.netmask), to_binary(network.netmask)),
+        "Wildcard": (str(network.hostmask), to_hex(network.hostmask), to_binary(network.hostmask)),
+        "Network": (str(network.network_address), to_hex(network.network_address), to_binary(network.network_address)),
+        "Broadcast": (str(network.broadcast_address), to_hex(network.broadcast_address), to_binary(network.broadcast_address)),
+        "Hostmin": (str(get_host_min(network)), to_hex(get_host_min(network)), to_binary(get_host_min(network))),
+        "Hostmax": (str(get_host_max(network)), to_hex(get_host_max(network)), to_binary(get_host_max(network))),
+        "Hosts": (network.num_addresses - 2 if network.num_addresses > 2 else 0, None, None)
     }
     
     return network_info
